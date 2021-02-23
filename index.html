@@ -34,6 +34,7 @@
 </body>
 <script>
     var plots = [];
+    var text = '';
     const uuid = PubNub.generateUUID();
     const pubnub = new PubNub({
         publishKey: "pub-c-d0559277-206f-4857-a56d-1ae0f326ad76",
@@ -53,10 +54,11 @@
         if (event.keyCode === 13) {
             // Cancel the default action, if needed
             // event.preventDefault();
- 
+            text = input.value;
+            input.value = '';
             pubnub.publish({
             channel : "pubnub_onboarding_channel",
-            message : {"sender": uuid, "content": input.value}
+            message : {"sender": uuid, "content": text}
             }, function(status, response) {
             //Handle error here
             });        
@@ -71,7 +73,6 @@
           guessedWordNode.innerHTML = event.message.content;                   
           guessedWords.appendChild(guessedWordNode);     
           guessedWords.scrollTop = guessedWords.scrollHeight; 
-          input.value = '';
         }else if(event.channel == 'draw'){
           if(!event.message) return;        
           ctx.beginPath();
