@@ -10,9 +10,10 @@
 </head>
 <body>
     <div class="tabs is-centered">
+        <span style="font-size: 1.5em;">DumSee</span>
         <ul>
-          <li class="is-active"><a>ARIIIIIIII</a></li>
-          <button onclick="clearCanvas()">CLEAR</button>
+          <li class="is-active"><a>Team 1</a></li>
+          <button onclick="clearCanvas()" class="button is-dark" style="margin:0.5px;">CLEAR</button>
         </ul>
       </div>
     <div class="columns">
@@ -94,7 +95,7 @@
   pubnub.history(
     {
       channel: 'pubnub_onboarding_channel',
-      count: 10,
+      count: 30,
       stringifiedTimeToken: true,
     },
     function (status, response) {
