@@ -82,7 +82,8 @@ canvas.onmousemove = function(e) {
         }
 
 
-
+        plots.push({x: x, y: y});
+        console.log(plots)
         lastX = mouseX;
         lastY = mouseY;
 
