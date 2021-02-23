@@ -31,7 +31,7 @@ function draw(e) {
 
 
 function drawOnCanvas(plots) {
-  console.log('plots',plots)
+  // console.log('plots',plots)
   if(plots.length == 0)return;
   ctx.beginPath();
   ctx.moveTo(plots[0].x, plots[0].y);
