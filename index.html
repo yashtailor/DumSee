@@ -6,6 +6,7 @@
     <title>Two Way Scribbl</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.2/css/bulma.min.css" integrity="sha512-byErQdWdTqREz6DLAA9pCnLbdoGGhXfU6gm1c8bkf7F51JVmUBlayGe2A31VpXWQP+eiJ3ilTAZHCR3vmMyybA==" crossorigin="anonymous" />
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.7.min.js"></script>
 </head>
 <body>
     <div class="tabs is-centered">
@@ -37,23 +38,133 @@
       </div>
 </body>
 <script>
+    const uuid = PubNub.generateUUID();
+    const pubnub = new PubNub({
+        publishKey: "pub-c-d0559277-206f-4857-a56d-1ae0f326ad76",
+        subscribeKey: "sub-c-b492ab9a-7592-11eb-b2c3-2e58680e8335",
+        uuid: uuid
+    });
+    pubnub.subscribe({
+        channels: ['pubnub_onboarding_channel'],
+        withPresence: true
+    });
     var input = document.getElementById("guessedWord");
     var guessedWords = document.getElementById('guessedWords');
     input.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
             // Cancel the default action, if needed
-            event.preventDefault();
+            // event.preventDefault();
             // Trigger the button element with a click
             //alert(input.value);
-            var guessedWordNode = document.createElement("div");   
-            guessedWordNode.className += 'wordList'
-            guessedWordNode.innerHTML = input.value;                   
-            guessedWords.appendChild(guessedWordNode);     
-            input.value = '';
-            guessedWords.scrollTop = guessedWords.scrollHeight;          
+            // var guessedWordNode = document.createElement("div");   
+            // guessedWordNode.className += 'wordList'
+            // guessedWordNode.innerHTML = input.value;                   
+            // guessedWords.appendChild(guessedWordNode);     
+            // guessedWords.scrollTop = guessedWords.scrollHeight;  
+            pubnub.publish({
+            channel : "pubnub_onboarding_channel",
+            message : {"sender": uuid, "content": input.value}
+            }, function(status, response) {
+            //Handle error here
+            });        
+            // input.value = '';
         }
     });
+    pubnub.addListener({
+    message: function(event) {
+        var guessedWordNode = document.createElement("div");   
+        guessedWordNode.className += 'wordList'
+        guessedWordNode.innerHTML = event.message.content;                   
+        guessedWords.appendChild(guessedWordNode);     
+        guessedWords.scrollTop = guessedWords.scrollHeight; 
+        input.value = '';
+    },
+    presence: function(event) {
+    //   let pElement = document.createElement('p');
+    //   pElement.appendChild(document.createTextNode(event.uuid + " has joined. That's you!"));
+    //   document.body.appendChild(pElement);
+    }
+  });
+
+  pubnub.history(
+    {
+      channel: 'pubnub_onboarding_channel',
+      count: 10,
+      stringifiedTimeToken: true,
+    },
+    function (status, response) {
+      let msgs = response.messages;
+      for (let i in msgs) {
+        var guessedWordNode = document.createElement("div");   
+        guessedWordNode.className += 'wordList'
+        guessedWordNode.innerHTML = msgs[i].entry.content;                   
+        guessedWords.appendChild(guessedWordNode);     
+        guessedWords.scrollTop = guessedWords.scrollHeight; 
+      }
+    }
+  );
 </script>
 <script src="paint.js"></script>
+<script>
+
+//   const uuid = PubNub.generateUUID();
+//   const pubnub = new PubNub({
+//     publishKey: "pub-c-d0559277-206f-4857-a56d-1ae0f326ad76",
+//     subscribeKey: "sub-c-b492ab9a-7592-11eb-b2c3-2e58680e8335",
+//     uuid: uuid
+//   });
+
+//   const button = document.getElementById('publish-button');
+
+//   button.addEventListener('click', () => {
+//     pubnub.publish({
+//       channel : "pubnub_onboarding_channel",
+//       message : {"sender": uuid, "content": "Hello From JavaScript SDK"}
+//     }, function(status, response) {
+//       //Handle error here
+//     });
+//   });
+
+//   pubnub.subscribe({
+//     channels: ['pubnub_onboarding_channel'],
+//     withPresence: true
+//   });
+
+//   pubnub.addListener({
+//     message: function(event) {
+//       let pElement = document.createElement('p');
+//       pElement.appendChild(document.createTextNode(event.message.content));
+//       document.body.appendChild(pElement);
+//     },
+//     presence: function(event) {
+//       let pElement = document.createElement('p');
+//       pElement.appendChild(document.createTextNode(event.uuid + " has joined. That's you!"));
+//       document.body.appendChild(pElement);
+//     }
+//   });
+
+//   pubnub.history(
+//     {
+//       channel: 'pubnub_onboarding_channel',
+//       count: 10,
+//       stringifiedTimeToken: true,
+//     },
+//     function (status, response) {
+//       let pElement = document.createElement('h3');
+//       pElement.appendChild(document.createTextNode('historical messages'));
+//       document.body.appendChild(pElement);
+
+//       pElement = document.createElement('ul');
+//       let msgs = response.messages;
+//       for (let i in msgs) {
+//         msg = msgs[i];
+//         let pElement = document.createElement('li');
+//         pElement.appendChild(document.createTextNode('sender: ' + msg.entry.sender + ', content: ' + msg.entry.content));
+//         document.body.appendChild(pElement);
+//       }
+//     }
+//   );
+
+</script>
 </html>
